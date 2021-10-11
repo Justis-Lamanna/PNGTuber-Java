@@ -1,1 +1,7 @@
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+
 channel.default: '542131086000521221'
+
+db.url: 'r2dbc:h2:mem:///testdb'
