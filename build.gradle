@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.5.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'com.github.node-gradle.node' version '3.1.1'
 }
 
 group = 'com.github.milomarten'
@@ -36,3 +37,35 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+node {
+	nodeProjectDir  = file("${project.projectDir}/app")
+	download = true
+	version = '14.15.5'
+}
+
+task startUi(type: NpmTask) {
+	group = 'ui'
+	args = ['run', 'start']
+}
+
+task buildUi(type: NpmTask) {
+	group = 'ui'
+	args = ['run', 'build']
+}
+
+task cleanUi(type: Delete) {
+	group = 'ui'
+	delete layout.projectDirectory.dir('src/main/resources/pngtuber-app')
+	delete layout.projectDirectory.dir('app/dist')
+}
+
+task packageUi(type: Copy) {
+	group = 'ui'
+	dependsOn 'buildUi'
+	from layout.projectDirectory.dir('app/dist/pngtuber-app')
+	into layout.projectDirectory.dir('src/main/resources/pngtuber-app')
+}
+
+compileJava.dependsOn(packageUi)
+clean.dependsOn(cleanUi)
