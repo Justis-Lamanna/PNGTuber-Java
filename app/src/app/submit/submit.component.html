@@ -1,2 +1,31 @@
-<p>submit works!</p>
-yay!
+<div class="container">
+  <form>
+    <div class="row">
+      <div class="col">
+        <label for="snowflake" class="form-label">User ID</label>
+        <input type="text" class="form-control" id="snowflake" placeholder="248612704019808258">
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col">
+        <label class="form-label">Offline</label>
+        <app-drag-and-drop></app-drag-and-drop>
+      </div>
+      <div class="col">
+        <label class="form-label">Idle</label>
+        <app-drag-and-drop></app-drag-and-drop>
+      </div>
+      <div class="col">
+        <label class="form-label">Speaking</label>
+        <app-drag-and-drop></app-drag-and-drop>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>

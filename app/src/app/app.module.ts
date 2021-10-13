@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { SubmitComponent } from './submit/submit.component';
 import { DragAndDropComponent } from './drag-and-drop/drag-and-drop.component';
 import { PngTuberComponent } from './png-tuber/png-tuber.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { PngTuberComponent } from './png-tuber/png-tuber.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

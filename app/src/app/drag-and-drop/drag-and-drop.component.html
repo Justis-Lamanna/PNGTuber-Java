@@ -1,1 +1,31 @@
-<p>drag-and-drop works!</p>
+<div [ngClass] = "{active: active, ready: !!content}" class="drop-zone container"
+     (drop)="onDrop($event)" (dragover)="onDragover($event)"
+     (dragenter)="onEnter($event, true)" (dragleave)="onEnter($event, false)">
+  <div *ngIf="!content && !contentUrl">
+    <div class="row justify-content-center">
+      <i class="bi bi-box-arrow-in-down-right drop-icon"></i>
+    </div>
+    <div class="row justify-content-center">Drop Files Here</div>
+    <div class="row justify-content-center">Or</div>
+    <div class="row justify-content-center">
+      <input type="file" accept="image/*" (change)="onFilePick($event)" #fileUpload>
+      <button type="button" class="btn btn-primary" (click)="fileUpload.click()">Upload File</button>
+    </div>
+    <div class="row justify-content-center">Or</div>
+    <div class="row justify-content-center">
+      <div class="input-group">
+        <input type="url" class="form-control" placeholder="Enter a URL here" #fileUrl>
+        <div class="input-group-append">
+          <button type="button" class="btn btn-primary" (click)="onUrlSet(fileUrl.value)">Set</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="content || contentUrl">
+    <button type="button" class="close" aria-label="Close" (click)="clearContent()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <img [src]="contentUrl" class="fit-to-container">
+    <div>{{ content?.name }}</div>
+  </div>
+</div>
