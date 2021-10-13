@@ -1,30 +1,30 @@
 <div class="container">
-  <form>
+  <form novalidate (ngSubmit)="submit()" [formGroup]="formGroup">
     <div class="row">
       <div class="col">
-        <label for="snowflake" class="form-label">User ID</label>
-        <input type="text" class="form-control" id="snowflake" placeholder="248612704019808258">
+        <label for="snowflake" class="form-label">User ID<span class="required">*</span></label>
+        <input type="text" formControlName="id" class="form-control" id="snowflake" placeholder="248612704019808258">
       </div>
     </div>
 
     <div class="row justify-content-center">
       <div class="col">
         <label class="form-label">Offline</label>
-        <app-drag-and-drop></app-drag-and-drop>
+        <app-drag-and-drop formControlName="offline"></app-drag-and-drop>
       </div>
       <div class="col">
-        <label class="form-label">Idle</label>
-        <app-drag-and-drop></app-drag-and-drop>
+        <label class="form-label">Idle<span class="required">*</span></label>
+        <app-drag-and-drop formControlName="idle"></app-drag-and-drop>
       </div>
       <div class="col">
         <label class="form-label">Speaking</label>
-        <app-drag-and-drop></app-drag-and-drop>
+        <app-drag-and-drop formControlName="speaking"></app-drag-and-drop>
       </div>
     </div>
 
     <div class="row">
       <div class="col">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Submit</button>
       </div>
     </div>
   </form>
