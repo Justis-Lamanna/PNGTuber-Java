@@ -56,7 +56,7 @@ task buildUi(type: NpmTask) {
 
 task cleanUi(type: Delete) {
 	group = 'ui'
-	delete layout.projectDirectory.dir('src/main/resources/pngtuber-app')
+	delete layout.projectDirectory.dir('src/main/resources/static')
 	delete layout.projectDirectory.dir('app/dist')
 }
 
@@ -64,8 +64,8 @@ task packageUi(type: Copy) {
 	group = 'ui'
 	dependsOn 'buildUi'
 	from layout.projectDirectory.dir('app/dist/pngtuber-app')
-	into layout.projectDirectory.dir('src/main/resources/pngtuber-app')
+	into layout.projectDirectory.dir('src/main/resources/static')
 }
 
-compileJava.dependsOn(packageUi)
+jar.dependsOn(packageUi)
 clean.dependsOn(cleanUi)

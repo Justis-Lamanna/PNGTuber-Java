@@ -5,7 +5,7 @@ import { PngTuberComponent } from './png-tuber/png-tuber.component';
 
 const routes: Routes = [
   { path: '', component: SubmitComponent, pathMatch: 'full' },
-  { path: '/pngtuber/:id', component: PngTuberComponent }
+  { path: 'pngtuber/:id', component: PngTuberComponent }
 ];
 
 @NgModule({
