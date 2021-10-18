@@ -1,6 +1,8 @@
 package com.github.milomarten.pngtuber;
 
 import com.github.milomarten.pngtuber.model.PngTuber;
+import com.github.milomarten.pngtuber.model.PngTuberPart;
+import com.github.milomarten.pngtuber.service.CdnService;
 import com.github.milomarten.pngtuber.service.DiscordService;
 import com.github.milomarten.pngtuber.service.PngTuberService;
 import discord4j.common.util.Snowflake;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.util.Map;
 
@@ -23,6 +27,9 @@ public class Endpoints {
 
     @Autowired
     private PngTuberService pngTuberService;
+
+    @Autowired
+    private CdnService cdnService;
 
     @Value("${channel.default}")
     private Snowflake defaultChannel;
@@ -45,6 +52,21 @@ public class Endpoints {
                              @RequestPart(value = "idleUrl", required = false) String idleUrl,
                              @RequestPart(value = "offlineUrl", required = false) String offlineUrl,
                              @RequestPart(value = "speakingUrl", required = false) String speakingUrl) {
-        return Mono.just("Thanks");
+        Mono<Tuple2<PngTuberPart, String>> idlePart = uploadOrGetUrl(PngTuberPart.IDLE, idle, idleUrl);
+        Mono<Tuple2<PngTuberPart, String>> speakingPart = uploadOrGetUrl(PngTuberPart.SPEAKING, speaking, speakingUrl);
+        Mono<Tuple2<PngTuberPart, String>> offlinePart = uploadOrGetUrl(PngTuberPart.OFFLINE, offline, offlineUrl);
+
+        return Flux.merge(idlePart, speakingPart, offlinePart)
+                .collect(new PngTuber.Collector(Long.parseLong(id)))
+                .map(tuber -> tuber.toString())
+                .doOnError(Throwable::printStackTrace);
+    }
+
+    private Mono<Tuple2<PngTuberPart, String>> uploadOrGetUrl(PngTuberPart part, FilePart upload, String url) {
+        return Mono.justOrEmpty(upload)
+                .flatMap(fp -> cdnService.upload(fp))
+                .map(fileId -> "/cdn/" + fileId)
+                .or(Mono.justOrEmpty(url))
+                .map(finalUrl -> Tuples.of(part, finalUrl));
     }
 }
