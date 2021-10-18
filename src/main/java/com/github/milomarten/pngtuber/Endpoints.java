@@ -39,7 +39,7 @@ public class Endpoints {
     private Snowflake defaultChannel;
 
     @PostMapping(value = "pngtuber/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<String> upload(@RequestPart("id") String id,
+    public Mono<PngTuber> upload(@RequestPart("id") String id,
                              @RequestPart(value = "idle", required = false) FilePart idle,
                              @RequestPart(value = "offline", required = false) FilePart offline,
                              @RequestPart(value = "speaking", required = false) FilePart speaking,
@@ -52,8 +52,7 @@ public class Endpoints {
 
         return Flux.merge(idlePart, speakingPart, offlinePart)
                 .collect(new PngTuber.Collector(Long.parseLong(id)))
-                .flatMap(pngTuberService::savePngTuber)
-                .map(PngTuber::toString);
+                .flatMap(pngTuberService::savePngTuber);
     }
 
     @GetMapping("pngtuber/{user}/name")
@@ -78,15 +77,12 @@ public class Endpoints {
     }
 
     private Mono<Tuple2<PngTuberPart, String>> uploadOrGetUrl(PngTuberPart part, FilePart upload, String url) {
-        if(isImage(upload)) {
-            return Mono.justOrEmpty(upload)
-                    .flatMap(fp -> cdnService.upload(fp))
-                    .map(fileId -> "/api/cdn/" + fileId)
-                    .or(Mono.justOrEmpty(url))
-                    .map(finalUrl -> Tuples.of(part, finalUrl));
-        } else {
-            return Mono.error(new UnknownFileType(upload));
-        }
+        return Mono.justOrEmpty(upload)
+                .flatMap(file -> isImage(file) ? Mono.just(file) : Mono.error(new UnknownFileType(file)))
+                .flatMap(fp -> cdnService.upload(fp))
+                .map(fileId -> "/api/cdn/" + fileId)
+                .or(Mono.justOrEmpty(url))
+                .map(finalUrl -> Tuples.of(part, finalUrl));
     }
 
     private boolean isImage(FilePart filePart) {

@@ -54,10 +54,10 @@ public class PngTuber implements Persistable<Long> {
 
     ///// Database Helper
     @Transient
+    @JsonIgnore
     private boolean _new;
 
     @Override
-    @JsonIgnore
     public boolean isNew() {
         return _new;
     }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment'
+import { environment } from '../../environments/environment';
+import { PngTuber } from '../model/png-tuber';
 
 @Component({
   selector: 'app-submit',
@@ -49,6 +50,9 @@ export class SubmitComponent implements OnInit {
       formData.append('speakingUrl', speaking.contentUrl);
     }
 
-    this.http.post(environment.url, formData).subscribe();
+    this.http.post<PngTuber>(environment.url, formData)
+      .subscribe(pngtuber => {
+        console.log(pngtuber);
+      });
   }
 }
