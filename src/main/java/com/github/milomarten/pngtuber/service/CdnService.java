@@ -30,6 +30,10 @@ public class CdnService {
                 .map(CdnImage::getId);
     }
 
+    public Mono<CdnImage> get(long id) {
+        return repository.findById(id);
+    }
+
     private Optional<String> getType(FilePart file) {
         return Optional.ofNullable(file.headers().getContentType())
                 .map(MediaType::toString);

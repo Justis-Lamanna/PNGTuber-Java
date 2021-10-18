@@ -2,13 +2,17 @@ package com.github.milomarten.pngtuber;
 
 import com.github.milomarten.pngtuber.model.PngTuber;
 import com.github.milomarten.pngtuber.model.PngTuberPart;
+import com.github.milomarten.pngtuber.model.UnknownFileType;
 import com.github.milomarten.pngtuber.service.CdnService;
 import com.github.milomarten.pngtuber.service.DiscordService;
 import com.github.milomarten.pngtuber.service.PngTuberService;
 import discord4j.common.util.Snowflake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,8 +53,7 @@ public class Endpoints {
         return Flux.merge(idlePart, speakingPart, offlinePart)
                 .collect(new PngTuber.Collector(Long.parseLong(id)))
                 .flatMap(pngTuberService::savePngTuber)
-                .map(PngTuber::toString)
-                .doOnError(Throwable::printStackTrace);
+                .map(PngTuber::toString);
     }
 
     @GetMapping("pngtuber/{user}/name")
@@ -64,15 +67,33 @@ public class Endpoints {
     }
 
     @GetMapping("cdn/{id}")
-    public Mono<String> getImage(String id) {
-        return Mono.just(id);
+    public Mono<ResponseEntity<byte[]>> getImage(@PathVariable long id) {
+        return cdnService.get(id)
+                .map(img -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.parseMediaType(img.getMimeType()));
+                    return new ResponseEntity<>(img.getImage(), headers, HttpStatus.OK);
+                })
+                .switchIfEmpty(Mono.fromRunnable(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)));
     }
 
     private Mono<Tuple2<PngTuberPart, String>> uploadOrGetUrl(PngTuberPart part, FilePart upload, String url) {
-        return Mono.justOrEmpty(upload)
-                .flatMap(fp -> cdnService.upload(fp))
-                .map(fileId -> "/api/cdn/" + fileId)
-                .or(Mono.justOrEmpty(url))
-                .map(finalUrl -> Tuples.of(part, finalUrl));
+        if(isImage(upload)) {
+            return Mono.justOrEmpty(upload)
+                    .flatMap(fp -> cdnService.upload(fp))
+                    .map(fileId -> "/api/cdn/" + fileId)
+                    .or(Mono.justOrEmpty(url))
+                    .map(finalUrl -> Tuples.of(part, finalUrl));
+        } else {
+            return Mono.error(new UnknownFileType(upload));
+        }
+    }
+
+    private boolean isImage(FilePart filePart) {
+        MediaType type = filePart.headers().getContentType();
+        if(type != null) {
+            return type.getType().equalsIgnoreCase("image");
+        }
+        return false;
     }
 }
