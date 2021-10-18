@@ -26,21 +26,16 @@ export class PngTuberComponent implements OnInit {
     this.id = this.route.snapshot.params['id'];
     this.name = this.http.get(environment.retrieveUrl + "/" + this.id + "/name", {responseType: 'text'});
     this.pngTuber = this.http.get<PngTuber>(environment.retrieveUrl + "/" + this.id + "/urls");
-    this.online = this.getServerSentEvent(environment.streamUrl + "/" + this.id + "/connect");
-    this.speaking = this.getServerSentEvent(environment.streamUrl + "/" + this.id + "/speak");
+    this.online = this.getServerSentEvent(environment.streamUrl + "/" + this.id + "/connect", "connect");
+    this.speaking = this.getServerSentEvent(environment.streamUrl + "/" + this.id + "/speak", "speak");
   }
 
-  getServerSentEvent(url: string): Observable<any> {
+  getServerSentEvent(url: string, event: string): Observable<any> {
       return Observable.create((observer: any) => {
         const eventSource = this.getEventSource(url);
-        eventSource.onmessage = function(event){
-          console.log(event);
-          observer.next(event);
-        };
-        eventSource.onerror = function(error){
-          console.log(error);
-          observer.error(error);
-        };
+        eventSource.addEventListener(event, function(e: any) {
+          observer.next(e.data === "true");
+        });
       });
     }
 

@@ -1,4 +1,4 @@
-<span>{{ name | async }}</span>
-<span>{{ (online | async)?.data }}</span>
-<span>{{ (speaking | async)?.data }}</span>
+<div>Name: {{ name | async }}</div>
+<div>Online: {{ online | async }}</div>
+<div>Speaking: {{ speaking | async }}</div>
 <pre> {{ pngTuber | async | json }}</pre>
