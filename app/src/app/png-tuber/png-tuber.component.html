@@ -1,1 +1,4 @@
-<p>png-tuber works!</p>
+<span>{{ name | async }}</span>
+<span>{{ (online | async)?.data }}</span>
+<span>{{ (speaking | async)?.data }}</span>
+<pre> {{ pngTuber | async | json }}</pre>

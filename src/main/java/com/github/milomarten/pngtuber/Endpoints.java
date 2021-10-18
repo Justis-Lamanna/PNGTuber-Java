@@ -51,7 +51,7 @@ public class Endpoints {
         Mono<Tuple2<PngTuberPart, String>> offlinePart = uploadOrGetUrl(PngTuberPart.OFFLINE, offline, offlineUrl);
 
         return Flux.merge(idlePart, speakingPart, offlinePart)
-                .collect(new PngTuber.Collector(Long.parseLong(id)))
+                .collect(new PngTuber.Collector(id))
                 .flatMap(pngTuberService::savePngTuber);
     }
 

@@ -1,5 +1,5 @@
 export interface PngTuber {
-  id: number,
+  id: string,
   notConnectedUrl?: string,
   idleUrl: string,
   speakingUrl?: string

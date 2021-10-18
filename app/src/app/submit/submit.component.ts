@@ -58,15 +58,11 @@ export class SubmitComponent implements OnInit {
       formData.append('speakingUrl', speaking.contentUrl);
     }
 
-    this.http.post<PngTuber>(environment.url, formData)
+    this.http.post<PngTuber>(environment.uploadUrl, formData)
       .subscribe(
         pngtuber => this.response = pngtuber,
         err => this.errorCause = err,
         () => this.submitted = false
       );
-  }
-
-  onViewClick() {
-    console.log(this.response);
   }
 }

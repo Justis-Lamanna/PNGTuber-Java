@@ -3,7 +3,6 @@ package com.github.milomarten.pngtuber.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Persistent;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import reactor.util.function.Tuple2;
@@ -17,19 +16,19 @@ import java.util.function.Supplier;
 
 @Data
 @NoArgsConstructor
-public class PngTuber implements Persistable<Long> {
+public class PngTuber implements Persistable<String> {
     @Id
-    private Long id;
+    private String id;
 
     private String notConnectedUrl;
     private String idleUrl;
     private String speakingUrl;
 
-    private PngTuber(long id) {
+    private PngTuber(String id) {
         this.id = id;
     }
 
-    public PngTuber(long id, String notConnectedUrl, String idleUrl, String speakingUrl) {
+    public PngTuber(String id, String notConnectedUrl, String idleUrl, String speakingUrl) {
         this.id = id;
         this.notConnectedUrl = notConnectedUrl;
         this.idleUrl = idleUrl;
@@ -71,7 +70,7 @@ public class PngTuber implements Persistable<Long> {
     /// Construction Helper
     @RequiredArgsConstructor
     public static class Collector implements java.util.stream.Collector<Tuple2<PngTuberPart, String>, PngTuber, PngTuber> {
-        private final long id;
+        private final String id;
 
         @Override
         public Supplier<PngTuber> supplier() {

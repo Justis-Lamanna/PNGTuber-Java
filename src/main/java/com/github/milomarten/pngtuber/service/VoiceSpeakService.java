@@ -5,6 +5,7 @@ import discord4j.core.GatewayDiscordClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class VoiceSpeakService {
@@ -12,6 +13,6 @@ public class VoiceSpeakService {
     private GatewayDiscordClient client;
 
     public Flux<Boolean> watchSpeaking(Snowflake user, Snowflake channel) {
-        return Flux.just(false);
+        return Flux.concat(Mono.just(false), Mono.never());
     }
 }

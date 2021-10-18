@@ -18,7 +18,7 @@ public class PngTuberService {
     private GatewayDiscordClient client;
 
     public Mono<PngTuber> getPngTuber(Snowflake user) {
-        return pngTuberRepository.findById(user.asLong())
+        return pngTuberRepository.findById(user.asString())
                 .switchIfEmpty(getDefaultPngTuber(user));
     }
 
@@ -33,6 +33,6 @@ public class PngTuberService {
     private Mono<PngTuber> getDefaultPngTuber(Snowflake user) {
         return client.getUserById(user)
                 .map(User::getAvatarUrl)
-                .map(s -> new PngTuber(user.asLong(), null, s, s));
+                .map(s -> new PngTuber(user.asString(), null, s, s));
     }
 }

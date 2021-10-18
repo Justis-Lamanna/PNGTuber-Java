@@ -5,5 +5,5 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PngTuberRepository extends R2dbcRepository<PngTuber, Long> {
+public interface PngTuberRepository extends R2dbcRepository<PngTuber, String> {
 }

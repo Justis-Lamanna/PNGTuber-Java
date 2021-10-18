@@ -17,7 +17,7 @@ public class Config {
     @Bean
     public GatewayDiscordClient client(@Value("${token}") String token) {
         return GatewayBootstrap.create(DiscordClient.create(token))
-                .setEnabledIntents(IntentSet.nonPrivileged().and(IntentSet.of(Intent.GUILD_PRESENCES)))
+                .setEnabledIntents(IntentSet.nonPrivileged().and(IntentSet.of(Intent.GUILD_PRESENCES, Intent.GUILD_VOICE_STATES)))
                 .login()
                 .block();
     }
