@@ -13,6 +13,10 @@ export class SubmitComponent implements OnInit {
 
   public readonly formGroup: FormGroup;
 
+  public submitted = false;
+  public errorCause: string | null = null;
+  public response: PngTuber | null = null;
+
   constructor(private readonly formBuilder: FormBuilder, private readonly http: HttpClient) {
     this.formGroup = this.formBuilder.group({
       id: ['', [Validators.required, Validators.pattern(/[0-9]{18}/)]],
@@ -26,6 +30,10 @@ export class SubmitComponent implements OnInit {
   }
 
   submit(): void {
+    this.submitted = true;
+    this.errorCause = null;
+    this.response = null;
+
     const formData = new FormData();
     formData.append('id', this.formGroup.get('id')?.value);
 
@@ -51,8 +59,14 @@ export class SubmitComponent implements OnInit {
     }
 
     this.http.post<PngTuber>(environment.url, formData)
-      .subscribe(pngtuber => {
-        console.log(pngtuber);
-      });
+      .subscribe(
+        pngtuber => this.response = pngtuber,
+        err => this.errorCause = err,
+        () => this.submitted = false
+      );
+  }
+
+  onViewClick() {
+    console.log(this.response);
   }
 }

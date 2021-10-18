@@ -22,9 +22,18 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row padded-row">
       <div class="col">
-        <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Submit</button>
+        <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid || submitted">Submit</button>
+      </div>
+      <div class="col" *ngIf="submitted">
+        Loading...
+      </div>
+      <div class="col" *ngIf="response">
+        <a class="btn btn-secondary" [routerLink]="['/pngtuber', response.id]">View</a>
+      </div>
+      <div class="col" *ngIf="errorCause">
+        {{ errorCause }}
       </div>
     </div>
   </form>

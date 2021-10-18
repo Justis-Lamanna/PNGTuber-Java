@@ -58,6 +58,7 @@ public class PngTuber implements Persistable<Long> {
     private boolean _new;
 
     @Override
+    @JsonIgnore
     public boolean isNew() {
         return _new;
     }
