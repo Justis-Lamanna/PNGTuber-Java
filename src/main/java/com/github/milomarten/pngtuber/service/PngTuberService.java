@@ -22,6 +22,14 @@ public class PngTuberService {
                 .switchIfEmpty(getDefaultPngTuber(user));
     }
 
+    public Mono<PngTuber> savePngTuber(PngTuber pngTuber) {
+        if(pngTuber.getId() == null) {
+            throw new NullPointerException("PNGTuber must have ID set");
+        }
+        return pngTuberRepository.existsById(pngTuber.getId())
+                .map(exists -> pngTuber.setNew(!exists));
+    }
+
     private Mono<PngTuber> getDefaultPngTuber(Snowflake user) {
         return client.getUserById(user)
                 .map(User::getAvatarUrl)

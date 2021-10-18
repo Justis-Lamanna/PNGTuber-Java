@@ -1,9 +1,14 @@
 package com.github.milomarten.pngtuber.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Persistent;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import reactor.util.function.Tuple2;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -11,78 +16,85 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PngTuber {
+public class PngTuber implements Persistable<Long> {
     @Id
-    private long id;
+    private Long id;
 
     private String notConnectedUrl;
     private String idleUrl;
     private String speakingUrl;
 
-    @RequiredArgsConstructor
-    private static class SoftBuilder {
-        private final long id;
+    private PngTuber(long id) {
+        this.id = id;
+    }
 
-        private String notConnectedUrl;
-        private String idleUrl;
-        private String speakingUrl;
+    public PngTuber(long id, String notConnectedUrl, String idleUrl, String speakingUrl) {
+        this.id = id;
+        this.notConnectedUrl = notConnectedUrl;
+        this.idleUrl = idleUrl;
+        this.speakingUrl = speakingUrl;
+    }
 
-        public SoftBuilder set(Tuple2<PngTuberPart, String> part) {
-            switch (part.getT1()) {
-                case IDLE: this.idleUrl = part.getT2(); break;
-                case SPEAKING: this.speakingUrl = part.getT2(); break;
-                case OFFLINE: this.notConnectedUrl = part.getT2(); break;
-            }
-            return this;
-        }
-
-        public SoftBuilder merge(SoftBuilder other) {
-            if(other.notConnectedUrl != null) {
-                this.notConnectedUrl = other.notConnectedUrl;
-            }
-            if(other.idleUrl != null) {
-                this.idleUrl = other.idleUrl;
-            }
-            if(other.speakingUrl != null) {
-                this.speakingUrl = other.speakingUrl;
-            }
-            return this;
-        }
-
-        public PngTuber build() {
-            return new PngTuber(id, notConnectedUrl, idleUrl, speakingUrl);
+    private void set(Tuple2<PngTuberPart, String> part) {
+        switch (part.getT1()) {
+            case IDLE: this.idleUrl = part.getT2(); break;
+            case OFFLINE: this.notConnectedUrl = part.getT2(); break;
+            case SPEAKING: this.speakingUrl = part.getT2(); break;
         }
     }
 
+    public PngTuber merge(PngTuber other) {
+        PngTuber nuu = new PngTuber(this.getId());
+        nuu.notConnectedUrl = Optional.of(notConnectedUrl).orElse(other.notConnectedUrl);
+        nuu.idleUrl = Optional.of(idleUrl).orElse(other.idleUrl);
+        nuu.speakingUrl = Optional.of(speakingUrl).orElse(other.speakingUrl);
+        return nuu;
+    }
+
+    ///// Database Helper
+    @Transient
+    private boolean _new;
+
+    @Override
+    @JsonIgnore
+    public boolean isNew() {
+        return _new;
+    }
+
+    public PngTuber setNew(boolean _new) {
+        this._new = _new;
+        return this;
+    }
+
+    /// Construction Helper
     @RequiredArgsConstructor
-    public static class Collector implements java.util.stream.Collector<Tuple2<PngTuberPart, String>, SoftBuilder, PngTuber> {
+    public static class Collector implements java.util.stream.Collector<Tuple2<PngTuberPart, String>, PngTuber, PngTuber> {
         private final long id;
 
         @Override
-        public Supplier<SoftBuilder> supplier() {
-            return () -> new SoftBuilder(id);
+        public Supplier<PngTuber> supplier() {
+            return () -> new PngTuber(id);
         }
 
         @Override
-        public BiConsumer<SoftBuilder, Tuple2<PngTuberPart, String>> accumulator() {
-            return SoftBuilder::set;
+        public BiConsumer<PngTuber, Tuple2<PngTuberPart, String>> accumulator() {
+            return PngTuber::set;
         }
 
         @Override
-        public BinaryOperator<SoftBuilder> combiner() {
-            return SoftBuilder::merge;
+        public BinaryOperator<PngTuber> combiner() {
+            return PngTuber::merge;
         }
 
         @Override
-        public Function<SoftBuilder, PngTuber> finisher() {
-            return SoftBuilder::build;
+        public Function<PngTuber, PngTuber> finisher() {
+            return Function.identity();
         }
 
         @Override
         public Set<Characteristics> characteristics() {
-            return Set.of(Characteristics.CONCURRENT, Characteristics.UNORDERED);
+            return Set.of(Characteristics.CONCURRENT, Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
         }
     }
 }

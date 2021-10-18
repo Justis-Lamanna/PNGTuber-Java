@@ -34,18 +34,8 @@ public class Endpoints {
     @Value("${channel.default}")
     private Snowflake defaultChannel;
 
-    @GetMapping("pngtuber/{user}/name")
-    public Mono<String> username(@PathVariable Snowflake user) {
-        return discordService.getUsername(user, defaultChannel);
-    }
-
-    @GetMapping("pngtuber/{user}/urls")
-    public Mono<PngTuber> pngTuber(@PathVariable Snowflake user) {
-        return pngTuberService.getPngTuber(user);
-    }
-
     @PostMapping(value = "pngtuber/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<String> test(@RequestPart("id") String id,
+    public Mono<String> upload(@RequestPart("id") String id,
                              @RequestPart(value = "idle", required = false) FilePart idle,
                              @RequestPart(value = "offline", required = false) FilePart offline,
                              @RequestPart(value = "speaking", required = false) FilePart speaking,
@@ -58,14 +48,30 @@ public class Endpoints {
 
         return Flux.merge(idlePart, speakingPart, offlinePart)
                 .collect(new PngTuber.Collector(Long.parseLong(id)))
-                .map(tuber -> tuber.toString())
+                .flatMap(pngTuberService::savePngTuber)
+                .map(PngTuber::toString)
                 .doOnError(Throwable::printStackTrace);
+    }
+
+    @GetMapping("pngtuber/{user}/name")
+    public Mono<String> username(@PathVariable Snowflake user) {
+        return discordService.getUsername(user, defaultChannel);
+    }
+
+    @GetMapping("pngtuber/{user}/urls")
+    public Mono<PngTuber> pngTuber(@PathVariable Snowflake user) {
+        return pngTuberService.getPngTuber(user);
+    }
+
+    @GetMapping("cdn/{id}")
+    public Mono<String> getImage(String id) {
+        return Mono.just(id);
     }
 
     private Mono<Tuple2<PngTuberPart, String>> uploadOrGetUrl(PngTuberPart part, FilePart upload, String url) {
         return Mono.justOrEmpty(upload)
                 .flatMap(fp -> cdnService.upload(fp))
-                .map(fileId -> "/cdn/" + fileId)
+                .map(fileId -> "/api/cdn/" + fileId)
                 .or(Mono.justOrEmpty(url))
                 .map(finalUrl -> Tuples.of(part, finalUrl));
     }
