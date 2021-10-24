@@ -22,21 +22,10 @@ public class Config {
                 .block();
     }
 
-//    @Bean(name = "multipartResolver")
-//    public CommonsMultipartResolver multipartResolver() {
-//        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-//        multipartResolver.setMaxUploadSize(100000);
-//        return multipartResolver;
-//    }
-
     @Bean
     public ConnectionFactoryInitializer database(@Value("${db.url}") String url) {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(ConnectionFactories.get(url));
-
-//        CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
-//        populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
-//        initializer.setDatabasePopulator(populator);
 
         return initializer;
     }

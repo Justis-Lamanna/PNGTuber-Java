@@ -1,4 +1,10 @@
-<div>Name: {{ name | async }}</div>
-<div>Online: {{ online | async }}</div>
-<div>Speaking: {{ speaking | async }}</div>
-<pre> {{ pngTuber | async | json }}</pre>
+<img [src]="(pngTuber | async)?.notConnectedUrl"
+     class="not-connected"
+     [hidden]="(online | async)">
+<img [src]="(pngTuber | async)?.idleUrl"
+     class="idle"
+     [hidden]="!(online | async) || (speaking | async)">
+<img [src]="(pngTuber | async)?.speakingUrl"
+     class="speaking"
+     [hidden]="!(online | async) || !(speaking | async)">
+<span class="name-badge" [hidden]="!(online | async)">{{ name | async }}</span>
