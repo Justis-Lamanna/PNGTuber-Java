@@ -36,7 +36,8 @@ dependencies {
 }
 
 test {
-	environment("token", System.getenv("token"))
+	environment("token", "abcdef")
+	logger.info(environment.toString())
 	useJUnitPlatform()
 }
 
