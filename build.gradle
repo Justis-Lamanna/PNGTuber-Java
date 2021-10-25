@@ -36,6 +36,11 @@ dependencies {
 }
 
 test {
+	if(project.hasProperty("token")) {
+		environment("token", project.property("token"))
+	} else {
+		logger.info("No Token Specified...")
+	}
 	useJUnitPlatform()
 }
 
