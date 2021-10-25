@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github.milomarten'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 sourceCompatibility = '13'
 
 configurations {
@@ -37,6 +37,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+springBoot {
+	mainClass = 'com.github.milomarten.pngtuber.PngtuberApplication'
 }
 
 node {
