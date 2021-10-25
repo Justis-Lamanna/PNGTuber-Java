@@ -36,6 +36,9 @@ dependencies {
 }
 
 test {
+	if(project.hasProperty("token")) {
+		environment("token", project.property("token"))
+	}
 	useJUnitPlatform()
 }
 
