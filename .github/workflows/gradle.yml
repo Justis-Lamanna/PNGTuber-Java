@@ -45,6 +45,7 @@ jobs:
         cd app
         npm ci
         npm run build:ci
+        cd ..
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
