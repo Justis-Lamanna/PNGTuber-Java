@@ -51,4 +51,4 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew test --args="--token=${{ secrets.DISCORD_TOKEN }}"
+      run: ./gradlew test -Dtoken=${{ secrets.DISCORD_TOKEN }}
