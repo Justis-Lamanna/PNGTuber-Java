@@ -16,6 +16,12 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 public class Config {
     @Bean
     public GatewayDiscordClient client(@Value("${token}") String token) {
+        if(token == null) {
+            System.out.println("Null Token");
+            throw new NullPointerException();
+        } else {
+            System.out.println("Token part: " + token.substring(0, 5));
+        }
         return GatewayBootstrap.create(DiscordClient.create(token))
                 .setEnabledIntents(IntentSet.nonPrivileged().and(IntentSet.of(Intent.GUILD_PRESENCES, Intent.GUILD_VOICE_STATES)))
                 .login()
