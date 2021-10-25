@@ -50,5 +50,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build with Gradle
-      run: ./gradlew test -Dtoken=${{ secrets.DISCORD_TOKEN }}
+    - name: Run test via gradlew
+      run: ./gradlew test
+      env:
+        token: ${{ secrets.DISCORD_TOKEN }}
