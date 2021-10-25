@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.github.milomarten'
 version = '1.0'
-sourceCompatibility = '13'
+sourceCompatibility = '17'
 
 configurations {
 	compileOnly {
@@ -36,7 +36,7 @@ dependencies {
 }
 
 test {
-	System.getProperties().list(System.out)
+	environment("token", System.getenv("token"))
 	useJUnitPlatform()
 }
 
