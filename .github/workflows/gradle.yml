@@ -40,8 +40,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Set up Packages + Test + Build
+      run: |
+        npm ci
+        npm run build:ci
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build -Ptoken=${{ secrets.DISCORD_TOKEN }}
