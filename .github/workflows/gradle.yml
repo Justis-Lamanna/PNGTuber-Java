@@ -42,6 +42,7 @@ jobs:
 
     - name: Set up Packages + Test + Build
       run: |
+        cd app
         npm ci
         npm run build:ci
 
