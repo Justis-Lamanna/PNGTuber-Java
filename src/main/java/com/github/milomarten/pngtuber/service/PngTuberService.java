@@ -30,10 +30,18 @@ public class PngTuberService {
     public Mono<PngTuber> savePngTuber(PngTuber pngTuber) {
         if(pngTuber.getVariant() == null) {
             return pngTuberRepository.findBySnowflake(pngTuber.getSnowflake())
+                    .map(old -> {
+                        pngTuber.setId(old.getId());
+                        return pngTuber;
+                    })
                     .defaultIfEmpty(pngTuber)
                     .flatMap(p -> pngTuberRepository.save(p));
         } else {
             return pngTuberRepository.findBySnowflakeAndVariant(pngTuber.getSnowflake(), pngTuber.getVariant())
+                    .map(old -> {
+                        pngTuber.setId(old.getId());
+                        return pngTuber;
+                    })
                     .defaultIfEmpty(pngTuber)
                     .flatMap(p -> pngTuberRepository.save(p));
         }
