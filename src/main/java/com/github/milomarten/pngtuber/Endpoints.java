@@ -40,6 +40,7 @@ public class Endpoints {
 
     @PostMapping(value = "pngtuber/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<PngTuber> upload(@RequestPart("id") String id,
+                             @RequestPart(value = "variant", required = false) String variant,
                              @RequestPart(value = "idle", required = false) FilePart idle,
                              @RequestPart(value = "offline", required = false) FilePart offline,
                              @RequestPart(value = "speaking", required = false) FilePart speaking,
@@ -51,7 +52,7 @@ public class Endpoints {
         Mono<Tuple2<PngTuberPart, String>> offlinePart = uploadOrGetUrl(PngTuberPart.OFFLINE, offline, offlineUrl);
 
         return Flux.merge(idlePart, speakingPart, offlinePart)
-                .collect(new PngTuber.Collector(id))
+                .collect(new PngTuber.Collector(id, variant))
                 .flatMap(pngTuberService::savePngTuber);
     }
 
@@ -61,8 +62,8 @@ public class Endpoints {
     }
 
     @GetMapping("pngtuber/{user}/urls")
-    public Mono<PngTuber> pngTuber(@PathVariable Snowflake user) {
-        return pngTuberService.getPngTuber(user);
+    public Mono<PngTuber> pngTuber(@PathVariable Snowflake user, @RequestParam(required = false) String variant) {
+        return variant == null ? pngTuberService.getPngTuber(user) : pngTuberService.getPngTuber(user, variant);
     }
 
     @GetMapping("cdn/{id}")
@@ -73,7 +74,7 @@ public class Endpoints {
                     headers.setContentType(MediaType.parseMediaType(img.getMimeType()));
                     return new ResponseEntity<>(img.getImage(), headers, HttpStatus.OK);
                 })
-                .switchIfEmpty(Mono.fromRunnable(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)));
+                .switchIfEmpty(Mono.fromSupplier(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND)));
     }
 
     private Mono<Tuple2<PngTuberPart, String>> uploadOrGetUrl(PngTuberPart part, FilePart upload, String url) {

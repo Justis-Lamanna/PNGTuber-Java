@@ -18,21 +18,30 @@ public class PngTuberService {
     private GatewayDiscordClient client;
 
     public Mono<PngTuber> getPngTuber(Snowflake user) {
-        return pngTuberRepository.findById(user.asString())
+        return pngTuberRepository.findBySnowflake(user.asString())
+                .switchIfEmpty(getDefaultPngTuber(user));
+    }
+
+    public Mono<PngTuber> getPngTuber(Snowflake user, String variant) {
+        return pngTuberRepository.findBySnowflakeAndVariant(user.asString(), variant)
                 .switchIfEmpty(getDefaultPngTuber(user));
     }
 
     public Mono<PngTuber> savePngTuber(PngTuber pngTuber) {
-        if(pngTuber.getId() == null) {
-            throw new NullPointerException("PNGTuber must have ID set");
+        if(pngTuber.getVariant() == null) {
+            return pngTuberRepository.findBySnowflake(pngTuber.getSnowflake())
+                    .defaultIfEmpty(pngTuber)
+                    .flatMap(p -> pngTuberRepository.save(p));
+        } else {
+            return pngTuberRepository.findBySnowflakeAndVariant(pngTuber.getSnowflake(), pngTuber.getVariant())
+                    .defaultIfEmpty(pngTuber)
+                    .flatMap(p -> pngTuberRepository.save(p));
         }
-        return pngTuberRepository.existsById(pngTuber.getId())
-                .map(exists -> pngTuber.setNew(!exists));
     }
 
     private Mono<PngTuber> getDefaultPngTuber(Snowflake user) {
         return client.getUserById(user)
                 .map(User::getAvatarUrl)
-                .map(s -> new PngTuber(user.asString(), null, s, s));
+                .map(s -> new PngTuber(null, user.asString(), null, null, s, s));
     }
 }
