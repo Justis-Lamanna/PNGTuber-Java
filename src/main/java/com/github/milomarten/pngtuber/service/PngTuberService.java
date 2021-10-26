@@ -18,8 +18,7 @@ public class PngTuberService {
     private GatewayDiscordClient client;
 
     public Mono<PngTuber> getPngTuber(Snowflake user) {
-        return pngTuberRepository.findBySnowflake(user.asString())
-                .switchIfEmpty(getDefaultPngTuber(user));
+        return getPngTuber(user, null);
     }
 
     public Mono<PngTuber> getPngTuber(Snowflake user, String variant) {

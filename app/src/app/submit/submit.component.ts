@@ -20,6 +20,7 @@ export class SubmitComponent implements OnInit {
   constructor(private readonly formBuilder: FormBuilder, private readonly http: HttpClient) {
     this.formGroup = this.formBuilder.group({
       id: ['', [Validators.required, Validators.pattern(/[0-9]{18}/)]],
+      variant: [''],
       offline: [null],
       idle: [null, [Validators.required]],
       speaking: [null]
@@ -36,6 +37,7 @@ export class SubmitComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('id', this.formGroup.get('id')?.value);
+    formData.append('variant', this.formGroup.get('variant')?.value);
 
     const offline = this.formGroup.get('offline')?.value;
     if(offline?.content) {
@@ -61,7 +63,7 @@ export class SubmitComponent implements OnInit {
     this.http.post<PngTuber>(environment.uploadUrl, formData)
       .subscribe(
         pngtuber => this.response = pngtuber,
-        err => this.errorCause = err,
+        err => this.errorCause = err.message,
         () => this.submitted = false
       );
   }

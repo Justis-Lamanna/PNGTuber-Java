@@ -7,6 +7,13 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="col">
+        <label for="variant" class="form-label">Variant</label>
+        <input type="text" formControlName="variant" class="form-control" id="variant">
+      </div>
+    </div>
+
     <div class="row justify-content-center">
       <div class="col">
         <label class="form-label">Offline</label>
@@ -30,7 +37,7 @@
         Loading...
       </div>
       <div class="col" *ngIf="response">
-        <a class="btn btn-secondary" [routerLink]="['/pngtuber', response.id]">View</a>
+        <a class="btn btn-secondary" [routerLink]="['/pngtuber', response.snowflake]">View</a>
       </div>
       <div class="col" *ngIf="errorCause">
         {{ errorCause }}

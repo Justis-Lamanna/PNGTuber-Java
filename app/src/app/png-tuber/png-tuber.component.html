@@ -7,4 +7,4 @@
 <img [src]="(pngTuber | async)?.speakingUrl"
      class="speaking"
      [hidden]="!(online | async) || !(speaking | async)">
-<span class="name-badge" [hidden]="!(online | async)">{{ name | async }}</span>
+<span class="name-badge" *ngIf="name" [hidden]="!(online | async)">{{ name | async }}</span>
